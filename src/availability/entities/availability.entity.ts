@@ -1,4 +1,4 @@
-import { weekday } from "generated/prisma";
+import { weekday } from "@prisma/client";
 
 export class Availability {
   availabilityId: string;

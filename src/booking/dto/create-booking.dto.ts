@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsUUID, IsDateString } from 'class-validator';
-import { BookingStatus } from 'generated/prisma';
+import { BookingStatus } from '@prisma/client';
 
 export class CreateBookingDto {
   @IsUUID()

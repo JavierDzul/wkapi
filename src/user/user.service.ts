@@ -181,7 +181,7 @@ export class UserService {
 
   }
   
-  prismaErrorHanler = (error: any, method: string, value: string = null) => { 
+  prismaErrorHanler = (error: any, method: string, value: string = '') => { 
    if (error.code === 'P2002') {
      this.logger.warn(`${method}: User already exists: ${value}`);
      throw new BadRequestException('User already exists');

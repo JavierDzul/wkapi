@@ -5,7 +5,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { HttpStatus, ExecutionContext } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
-import { Role } from 'generated/prisma';
+import { Role } from '@prisma/client';
 import { GetUser } from './decorators'; // Import the GetUser decorator
 
 describe('AuthController', () => {

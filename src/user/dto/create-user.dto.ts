@@ -1,5 +1,5 @@
 
-import { Role } from "generated/prisma";
+import { Role } from "@prisma/client";
 import { IsOptional, IsString } from "class-validator";
 
 import { RegisterUserDto } from "src/auth/dto/register-user.dto";

@@ -163,7 +163,7 @@ describe('AuthService', () => {
         id: '2313w49-0db7-4v79-aacc-52624343bf2t',
         name: 'Test User',
         email: 'test@example.com',
-        image: null,
+        image: undefined,
         role: 'user',
         createdAt: new Date(),
       };

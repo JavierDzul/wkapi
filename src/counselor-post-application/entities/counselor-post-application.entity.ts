@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "generated/prisma";
+import { ApplicationStatus } from "@prisma/client";
 
 export class CounselorPostApplication {
   applicationId: string;

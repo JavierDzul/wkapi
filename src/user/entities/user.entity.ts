@@ -1,5 +1,5 @@
 
-import { Role } from "generated/prisma";
+import { Role } from "@prisma/client";
 
 export class User {
     
@@ -31,7 +31,7 @@ export class User {
     role: Role;
     
   
-    image?: string;
+    image?: string ;
 
     
     

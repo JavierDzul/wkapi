@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
-import { ApplicationStatus } from 'generated/prisma';
+import { ApplicationStatus } from '@prisma/client';
 
 export class CreateCounselorPostApplicationDto {
   @IsUUID()
