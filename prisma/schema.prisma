@@ -1,0 +1,194 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Role {
+  admin
+  user
+}
+
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  password      String
+  role          Role      @default(user)
+  image         String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  student       Student?
+  counselor     Counselor?
+  //Relations and Indexes
+ 
+}
+
+model Student{
+
+  studentId     String    @id @default(uuid())
+  userID        String    @unique
+  user          User      @relation(fields: [userID], references: [id])
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  //Relations and Indexes
+
+  preferences Preference[]
+
+  booking booking[]
+
+  StudentPost StudentPost[]
+}
+
+model Counselor{
+
+  counselorId   String    @id @default(uuid())
+  userID        String    @unique
+  user          User      @relation(fields: [userID], references: [id])
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  preferences Preference[]
+  //Relations and Indexes
+
+  availability availability[]
+
+  booking booking[]
+
+  Counselor_Post_Application Counselor_Post_Application[]
+}
+
+
+model Preference {
+
+  preferenceId  String    @id @default(uuid())
+  name          String    @unique
+  description   String
+  
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  //Relations and Indexes
+
+  fatherPreference   Preference?   @relation("PreferenceHierarchy", fields: [fatherPreferenceId], references: [preferenceId])
+  fatherPreferenceId String?
+  childPreferences Preference[] @relation("PreferenceHierarchy")
+  students Student[]
+  counselors Counselor[]
+  
+}
+
+model availability {
+
+  availabilityId String    @id @default(uuid())
+  counselorId   String
+  counselor     Counselor @relation(fields: [counselorId], references: [counselorId])
+  
+  weekday       weekday
+  startTime     DateTime   @db.Time()
+  endTime       DateTime   @db.Time()
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  //Relations and Indexes
+
+}
+
+enum weekday {
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
+}
+
+model booking{
+
+  bookingId     String    @id @default(uuid())
+  studentId     String
+  counselorId   String
+  status        BookingStatus @default(booked)
+
+  student       Student   @relation(fields: [studentId], references: [studentId])
+  counselor     Counselor @relation(fields: [counselorId], references: [counselorId])
+
+  date          DateTime @db.Date()
+  startTime     DateTime @db.Time()
+  endTime       DateTime @db.Time()
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+}
+
+enum BookingStatus {
+  booked
+  cancelled
+  completed
+}
+
+model StudentPost{
+  postId        String    @id @default(uuid())
+  studentId     String
+  title         String
+  description   String
+  content       String?
+  
+
+  date         DateTime   @db.Date
+  startTime     DateTime  @db.Time()
+  endTime       DateTime  @db.Time()
+  closedDate    DateTime  @db.Timestamp()
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  student       Student   @relation(fields: [studentId], references: [studentId])
+
+  Counselor_Post_Application Counselor_Post_Application[]
+}
+
+enum PostStatus {
+  receiving
+  closed
+  booked
+  archived
+}
+
+model Counselor_Post_Application {
+  applicationId String    @id @default(uuid())
+  postId        String
+  counselorId   String
+  status        ApplicationStatus @default(pending)
+
+  post          StudentPost @relation(fields: [postId], references: [postId])
+  counselor     Counselor   @relation(fields: [counselorId], references: [counselorId])
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum ApplicationStatus {
+  pending
+  accepted
+  rejected
+}
