@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentPostDto } from './dto/create-student-post.dto';
 import { UpdateStudentPostDto } from './dto/update-student-post.dto';
@@ -33,4 +33,23 @@ export class StudentPostService {
       where: { postId },
     });
   }
+
+  async getPostsByStudentUserId(userId: string) {
+  const student = await this.prisma.student.findUnique({
+    where: { userID:userId },
+    select: { studentId: true },
+  });
+
+  if (!student) {
+    throw new NotFoundException("No hay estudiante asociado al usuario actual.");
+  }
+
+  return this.prisma.studentPost.findMany({
+    where: { studentId: student.studentId },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+
+
 }

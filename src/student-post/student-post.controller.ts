@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { StudentPostService } from './student-post.service';
 import { CreateStudentPostDto } from './dto/create-student-post.dto';
@@ -25,6 +27,14 @@ export class StudentPostController {
     return this.studentPostService.findAll();
   }
 
+  
+  @Get('my-posts')
+  async getMyPosts(@Req() req) {
+    const userId = req.user.userId;
+    return this.studentPostService.getPostsByStudentUserId(userId);
+  }
+
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.studentPostService.findOne(id);
@@ -39,4 +49,7 @@ export class StudentPostController {
   remove(@Param('id') id: string) {
     return this.studentPostService.remove(id);
   }
+
+  
+
 }
