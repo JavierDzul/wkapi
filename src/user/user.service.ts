@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from './entities/user.entity';
 import { Role } from '@prisma/client';
+import { SetRoleAndPreferencesDto } from './dto/select-role.dto';
 
 
 @Injectable()
@@ -180,6 +181,61 @@ export class UserService {
 
 
   }
+
+
+  // user.service.ts
+async setRoleAndPreferences(userId: string, dto: SetRoleAndPreferencesDto) {
+  const { role, preferences } = dto;
+
+  const user = await this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      role,
+      ...(role === 'student'
+        ? {
+            student: {
+              upsert: {
+                create: {
+                  preferences: {
+                    connect: preferences.map((id) => ({ preferenceId: id })),
+                  },
+                },
+                update: {
+                  preferences: {
+                    set: [], // clear previous
+                    connect: preferences.map((id) => ({ preferenceId: id })),
+                  },
+                },
+              },
+            },
+          }
+        : {
+            counselor: {
+              upsert: {
+                create: {
+                  preferences: {
+                    connect: preferences.map((id) => ({ preferenceId: id })),
+                  },
+                },
+                update: {
+                  preferences: {
+                    set: [],
+                    connect: preferences.map((id) => ({ preferenceId: id })),
+                  },
+                },
+              },
+            },
+          }),
+    },
+    include: {
+      student: true,
+      counselor: true,
+    },
+  });
+
+  return user;
+}
+
   
   prismaErrorHanler = (error: any, method: string, value: string = '') => { 
    if (error.code === 'P2002') {

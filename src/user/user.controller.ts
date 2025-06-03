@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from './entities/user.entity';
 import { Role } from '@prisma/client';
+import { SetRoleAndPreferencesDto } from './dto/select-role.dto';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -123,5 +124,16 @@ export class UserController {
   removeByEmail(@Param('email') email: string, @GetUser() user: User) {
     return this.userService.remove("email", email, user);
   }
+
+
+  // user.controller.ts
+  @Patch(':id/set-role-and-preferences')
+  async setRoleAndPreferences(
+    @Param('id') userId: string,
+    @Body() dto: SetRoleAndPreferencesDto
+  ) {
+    return this.userService.setRoleAndPreferences(userId, dto);
+}
+
 
 }

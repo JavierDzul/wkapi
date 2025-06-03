@@ -3,9 +3,12 @@ import { PreferenceService } from './preference.service';
 import { CreatePreferenceDto } from './dto/create-preference.dto';
 import { UpdatePreferenceDto } from './dto/update-preference.dto';
 
+console.log('PreferenceController initialized')
 @Controller('preferences')
 export class PreferenceController {
   constructor(private readonly preferenceService: PreferenceService) {}
+
+  
 
   @Post()
   create(@Body() createPreferenceDto: CreatePreferenceDto) {
@@ -16,6 +19,13 @@ export class PreferenceController {
   findAll() {
     return this.preferenceService.findAll();
   }
+
+  @Get('with-hierarchy')
+ async getPreferencesWithHierarchy() {
+  console.log( await this.preferenceService.getPreferencesWithHierarchy());
+  return await this.preferenceService.getPreferencesWithHierarchy();
+}
+
 
   @Get(':preferenceId')
   findOne(@Param('preferenceId') preferenceId: string) {
@@ -31,4 +41,8 @@ export class PreferenceController {
   remove(@Param('preferenceId') preferenceId: string) {
     return this.preferenceService.remove(preferenceId);
   }
+
+  // preferences.controller.ts
+
+
 }
