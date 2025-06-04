@@ -1,24 +1,23 @@
-import { IsEnum, IsNotEmpty, IsUUID, IsDateString } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { BookingStatus } from '@prisma/client';
 
 export class CreateBookingDto {
-  @IsUUID()
-  @IsNotEmpty()
+  @IsString()
   studentId: string;
 
-  @IsUUID()
-  @IsNotEmpty()
+  @IsString()
   counselorId: string;
 
+  @IsDateString()
+  date: string; // YYYY-MM-DD
+
+  @IsString()
+  startTime: string; // HH:mm
+
+  @IsString()
+  endTime: string; // HH:mm
+
+  @IsOptional()
   @IsEnum(BookingStatus)
-  status: BookingStatus;
-
-  @IsDateString()
-  date: string;
-
-  @IsDateString()
-  startTime: string;
-
-  @IsDateString()
-  endTime: string;
+  status?: BookingStatus;
 }

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { CounselorService } from './counselor.service';
 import { CreateCounselorDto } from './dto/create-counselor.dto';
 import { UpdateCounselorDto } from './dto/update-counselor.dto';
+import { PublicCounselorProfileDto } from './dto/public-counselor-profile.dto';
+import { CounselorSummaryDto } from './dto/counselor-summary.dto';
 
 @Controller('counselors')
 export class CounselorController {
@@ -13,10 +15,21 @@ export class CounselorController {
   }
 
   @Get()
-  findAll() {
+  findAll() : Promise<CounselorSummaryDto[]>{
     return this.counselorService.findAll();
   }
-
+  // New endpoint for the public profile
+  @Get(':counselorId/public-profile')
+  async getPublicProfile(@Param('counselorId') counselorId: string): Promise<PublicCounselorProfileDto> {
+    try {
+      return await this.counselorService.getPublicProfile(counselorId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw error; // Re-throw other errors
+    }
+  }
   @Get(':counselorId')
   findOne(@Param('counselorId') counselorId: string) {
     return this.counselorService.findOne(counselorId);
