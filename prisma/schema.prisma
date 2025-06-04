@@ -20,8 +20,6 @@ enum Role {
   counselor
   admin
   user
-  counselor
-  student
 }
 
 
