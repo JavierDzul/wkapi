@@ -20,6 +20,8 @@ enum Role {
   counselor
   admin
   user
+  counselor
+  student
 }
 
 
@@ -63,7 +65,17 @@ model Counselor{
   counselorId   String    @id @default(uuid())
   userID        String    @unique
   user          User      @relation(fields: [userID], references: [id])
-  
+   experience    String?   // e.g., "5 años de experiencia"
+  sessionPrice  Float?    // e.g., 75.0
+  // For list view, these might be direct fields or simplified calculations
+  // For a real system, rating and totalReviews would come from a Review model
+  rating        Float?    // e.g., 4.8 (can be mocked if no review system)
+  totalReviews  Int?      // e.g., 120 (can be mocked)
+   bio           String?
+  education     String[]  @default([])
+  certifications String[] @default([])
+  languages     String[]  @default([])
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
