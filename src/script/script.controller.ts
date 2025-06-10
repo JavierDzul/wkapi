@@ -38,12 +38,15 @@ document.addEventListener('submit', function(e) {
       timestamp: new Date().toISOString()
     };
     fetch('https://api.jdpdprojects.top/api/track?key=${key}', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    }).finally(function() {
-      form.submit(); // Submit the form after tracking
-    });
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify(data)
+}).then(function() {
+  form.submit(); // Submit the form after tracking completes
+}).catch(function(err) {
+  console.error('Tracking failed', err);
+  form.submit(); // Still submit the form even if tracking fails
+});
   }
 }, true);
 })(); // <--- Make sure this is present!
