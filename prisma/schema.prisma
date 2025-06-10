@@ -23,184 +23,76 @@ enum Role {
 }
 
 
-model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  emailVerified DateTime?
-  password      String
-  role          Role?      
-  image         String?
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  student       Student?
-  counselor     Counselor?
-  //Relations and Indexes
- 
-}
-
-model Student{
-
-  studentId     String    @id @default(uuid())
-  userID        String    @unique
-  user          User      @relation(fields: [userID], references: [id])
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  //Relations and Indexes
-
-  preferences Preference[]
-
-  booking booking[]
-
-  StudentPost StudentPost[]
-}
-
-model Counselor{
-
-  counselorId   String    @id @default(uuid())
-  userID        String    @unique
-  user          User      @relation(fields: [userID], references: [id])
-   experience    String?   // e.g., "5 años de experiencia"
-  sessionPrice  Float?    // e.g., 75.0
-  // For list view, these might be direct fields or simplified calculations
-  // For a real system, rating and totalReviews would come from a Review model
-  rating        Float?    // e.g., 4.8 (can be mocked if no review system)
-  totalReviews  Int?      // e.g., 120 (can be mocked)
-   bio           String?
-  education     String[]  @default([])
-  certifications String[] @default([])
-  languages     String[]  @default([])
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  preferences Preference[]
-  //Relations and Indexes
-
-  availability availability[]
-
-  booking booking[]
-
-  Counselor_Post_Application Counselor_Post_Application[]
+model Publisher {
+  id             String   @id @default(uuid())
+  name           String
+  apiKey         String   @unique
+  scriptEndpoint String   @unique
+  createdAt      DateTime @default(now())
+  leads          Lead[]
 }
 
 
-model Preference {
 
-  preferenceId  String    @id @default(uuid())
-  name          String    @unique
-  description   String
-  
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  //Relations and Indexes
+model Lead {
+  id            String   @id @default(uuid())
+  publisherId   String
+  publisher     Publisher @relation(fields: [publisherId], references: [id])
+  hubspotUtk    String?
+  pageUrl       String
+  pageTitle     String
+  referrer      String?
+  snippet       String?
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  utmTerm       String?
+  utmContent    String?
+  userAgent     String
+  platform      String
+  language      String
+  screenWidth   Int
+  screenHeight  Int
+  timestamp     DateTime
 
-  fatherPreference   Preference?   @relation("PreferenceHierarchy", fields: [fatherPreferenceId], references: [preferenceId])
-  fatherPreferenceId String?
-  childPreferences Preference[] @relation("PreferenceHierarchy")
-  students Student[]
-  counselors Counselor[]
-  
+  source        String? // Added to support relation to CampaignSource
+
+  campaignSource   CampaignSource? @relation(fields: [source], references: [code])
+  conversions      Conversion[]
+  logs             SubmissionLog[]
+
+  formData        Json? // <-- Add this line
 }
 
-model availability {
 
-  availabilityId String    @id @default(uuid())
-  counselorId   String
-  counselor     Counselor @relation(fields: [counselorId], references: [counselorId])
-  
-  weekday       weekday
-  startTime     DateTime   @db.Time()
-  endTime       DateTime   @db.Time()
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  //Relations and Indexes
+model CampaignSource {
+  id        Int     @id @default(autoincrement())
+  code      String  @unique // Matches Lead.source
+  name      String?
+  notes     String?
+  createdAt DateTime @default(now())
 
+  leads     Lead[]
 }
 
-enum weekday {
-  monday
-  tuesday
-  wednesday
-  thursday
-  friday
-  saturday
-  sunday
+model Conversion {
+  id        Int      @id @default(autoincrement())
+  leadId    String
+  type      String   // e.g. "signup", "purchase"
+  value     Float?   // Optional value ($, etc)
+  notes     String?
+  createdAt DateTime @default(now())
+
+  lead      Lead     @relation(fields: [leadId], references: [id])
 }
 
-model booking{
+model SubmissionLog {
+  id             Int      @id @default(autoincrement())
+  leadId         String
+  status         String   // e.g., "success", "error", "retry"
+  responseCode   Int?
+  responseBody   Json?
+  attemptedAt    DateTime @default(now())
 
-  bookingId     String    @id @default(uuid())
-  studentId     String
-  counselorId   String
-  status        BookingStatus @default(booked)
-
-  student       Student   @relation(fields: [studentId], references: [studentId])
-  counselor     Counselor @relation(fields: [counselorId], references: [counselorId])
-
-  date          DateTime @db.Date()
-  startTime     DateTime @db.Time()
-  endTime       DateTime @db.Time()
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-}
-
-enum BookingStatus {
-  booked
-  cancelled
-  completed
-}
-
-model StudentPost{
-  postId        String    @id @default(uuid())
-  studentId     String
-  title         String
-  description   String
-  content       String?
-  
-
-  date         DateTime   @db.Date
-  startTime     DateTime  @db.Time()
-  endTime       DateTime  @db.Time()
-  closedDate    DateTime  @db.Timestamp()
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  student       Student   @relation(fields: [studentId], references: [studentId])
-
-  Counselor_Post_Application Counselor_Post_Application[]
-}
-
-enum PostStatus {
-  receiving
-  closed
-  booked
-  archived
-}
-
-model Counselor_Post_Application {
-  applicationId String    @id @default(uuid())
-  postId        String
-  counselorId   String
-  status        ApplicationStatus @default(pending)
-
-  post          StudentPost @relation(fields: [postId], references: [postId])
-  counselor     Counselor   @relation(fields: [counselorId], references: [counselorId])
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-enum ApplicationStatus {
-  pending
-  accepted
-  rejected
+  lead           Lead     @relation(fields: [leadId], references: [id])
 }
