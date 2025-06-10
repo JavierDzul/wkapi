@@ -36,11 +36,11 @@ export class ScriptController {
         screenHeight: window.screen.height,
         timestamp: new Date().toISOString()
       };
-      fetch('http://localhost:5000/api/track?key=${key}', {
+     fetch('https://api.jdpdprojects.top/api/track?key=${key}', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
-      });
+    });
     }
   }, true);
 })(); // <--- Make sure this is present!
